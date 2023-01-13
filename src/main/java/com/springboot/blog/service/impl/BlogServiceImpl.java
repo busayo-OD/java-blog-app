@@ -41,6 +41,17 @@ public class BlogServiceImpl implements BlogService {
         return mapToDto(blog);
     }
 
+    @Override
+    public BlogDto updateBlog(BlogDto blogDto, Long id) {
+        Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
+        blog.setTitle(blogDto.getTitle());
+        blog.setDescription(blogDto.getDescription());
+        blog.setContent(blogDto.getContent());
+
+        Blog updatedBlog = blogRepository.save(blog);
+        return mapToDto(updatedBlog);
+    }
+
     //        convert entity to dto
     private BlogDto mapToDto(Blog blog){
         BlogDto blogDto = new BlogDto();

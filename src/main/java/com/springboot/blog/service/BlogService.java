@@ -8,4 +8,5 @@ public interface BlogService {
     BlogDto createBlog(BlogDto blogDto);
     List<BlogDto> getAllBlogs();
     BlogDto getBlogById(Long id);
+    BlogDto updateBlog(BlogDto blogDto, Long id);
 }

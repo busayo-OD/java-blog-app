@@ -32,4 +32,9 @@ public class BlogController {
     public ResponseEntity<BlogDto> getBlogById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BlogDto> updateBlog(@RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
+        return ResponseEntity.ok(blogService.updateBlog(blogDto, id));
+    }
 }
