@@ -9,6 +9,7 @@ import com.springboot.blog.service.BlogService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogDto createBlog(BlogDto blogDto) {
 
-//
+//        convert dto to entity
         Blog blog = mapToEntity(blogDto);
         Blog newBlog = blogRepository.save(blog);
 
@@ -36,10 +37,14 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public BlogResponse getAllBlogs(int pageNo, int pageSize) {
+    public BlogResponse getAllBlogs(int pageNo, int pageSize, String sortBy, String sortDir) {
+
+//        create a sort object
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
 //      create pageable instance
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<Blog> blogs = blogRepository.findAll(pageable);
 
