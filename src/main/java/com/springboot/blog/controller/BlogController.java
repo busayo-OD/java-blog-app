@@ -1,6 +1,7 @@
 package com.springboot.blog.controller;
 
 import com.springboot.blog.dto.BlogDto;
+import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.service.BlogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,11 @@ public class BlogController {
     }
 
     @GetMapping()
-    public List<BlogDto> getAllBlogs(){
-        return blogService.getAllBlogs();
+    public BlogResponse getAllBlogs(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ){
+        return blogService.getAllBlogs(pageNo, pageSize);
     }
 
     @GetMapping("/{id}")
@@ -36,5 +40,11 @@ public class BlogController {
     @PutMapping("/{id}")
     public ResponseEntity<BlogDto> updateBlog(@RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.updateBlog(blogDto, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBlogById(@PathVariable(name = "id") Long id){
+        blogService.deleteBlog(id);
+        return new ResponseEntity("Blog deleted successfully", HttpStatus.OK);
     }
 }
