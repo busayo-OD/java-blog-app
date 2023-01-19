@@ -6,6 +6,7 @@ import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.model.Blog;
 import com.springboot.blog.repository.BlogRepository;
 import com.springboot.blog.service.BlogService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 public class BlogServiceImpl implements BlogService {
 
     private BlogRepository blogRepository;
+    private ModelMapper modelMapper;
 
-    public BlogServiceImpl(BlogRepository blogRepository) {
+    public BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper) {
         this.blogRepository = blogRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -89,22 +92,22 @@ public class BlogServiceImpl implements BlogService {
 
     //        convert entity to dto
     private BlogDto mapToDto(Blog blog){
-        BlogDto blogDto = new BlogDto();
-        blogDto.setId(blog.getId());
-        blogDto.setTitle(blog.getTitle());
-        blogDto.setDescription(blog.getDescription());
-        blogDto.setContent(blog.getContent());
-
+        BlogDto blogDto = modelMapper.map(blog, BlogDto.class);
+//        BlogDto blogDto = new BlogDto();
+//        blogDto.setId(blog.getId());
+//        blogDto.setTitle(blog.getTitle());
+//        blogDto.setDescription(blog.getDescription());
+//        blogDto.setContent(blog.getContent());
         return blogDto;
     }
 
     //        convert dto to entity
     private Blog mapToEntity(BlogDto blogDto){
-        Blog blog = new Blog();
-        blog.setTitle(blogDto.getTitle());
-        blog.setDescription(blogDto.getDescription());
-        blog.setContent(blogDto.getContent());
-
+        Blog blog = modelMapper.map(blogDto, Blog.class);
+//        Blog blog = new Blog();
+//        blog.setTitle(blogDto.getTitle());
+//        blog.setDescription(blogDto.getDescription());
+//        blog.setContent(blogDto.getContent());
         return blog;
     }
 
