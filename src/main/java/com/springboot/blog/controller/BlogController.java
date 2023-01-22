@@ -4,6 +4,7 @@ import com.springboot.blog.dto.BlogDto;
 import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class BlogController {
     }
 
     @PostMapping
-    public ResponseEntity<BlogDto> createBlog(@RequestBody BlogDto blogDto){
+    public ResponseEntity<BlogDto> createBlog(@Valid  @RequestBody BlogDto blogDto){
         return new ResponseEntity<>(blogService.createBlog(blogDto), HttpStatus.CREATED);
     }
 
@@ -40,7 +41,7 @@ public class BlogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BlogDto> updateBlog(@RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
+    public ResponseEntity<BlogDto> updateBlog(@Valid @RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.updateBlog(blogDto, id));
     }
 
