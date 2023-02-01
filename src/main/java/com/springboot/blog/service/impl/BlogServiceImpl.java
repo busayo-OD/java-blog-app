@@ -4,7 +4,9 @@ import com.springboot.blog.dto.BlogDto;
 import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.model.Blog;
+import com.springboot.blog.model.Category;
 import com.springboot.blog.repository.BlogRepository;
+import com.springboot.blog.repository.CategoryRepository;
 import com.springboot.blog.service.BlogService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,17 +23,23 @@ public class BlogServiceImpl implements BlogService {
 
     private BlogRepository blogRepository;
     private ModelMapper modelMapper;
+    private CategoryRepository categoryRepository;
 
-    public BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper) {
+    public BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
         this.blogRepository = blogRepository;
         this.modelMapper = modelMapper;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public BlogDto createBlog(BlogDto blogDto) {
 
+        Category category = categoryRepository.findById(blogDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", blogDto.getCategoryId()));
+
 //        convert dto to entity
         Blog blog = mapToEntity(blogDto);
+        blog.setCategory(category);
         Blog newBlog = blogRepository.save(blog);
 
 //        convert entity to dto
@@ -76,9 +84,13 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogDto updateBlog(BlogDto blogDto, Long id) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
+        Category category = categoryRepository.findById(blogDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", blogDto.getCategoryId()));
+
         blog.setTitle(blogDto.getTitle());
         blog.setDescription(blogDto.getDescription());
         blog.setContent(blogDto.getContent());
+        blog.setCategory(category);
 
         Blog updatedBlog = blogRepository.save(blog);
         return mapToDto(updatedBlog);
@@ -88,6 +100,17 @@ public class BlogServiceImpl implements BlogService {
     public void deleteBlog(Long id) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
         blogRepository.delete(blog);
+    }
+
+    @Override
+    public List<BlogDto> getBlogsByCategory(Long categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
+        List<Blog> blogs = blogRepository.findByCategoryId(categoryId);
+        return blogs.stream().map((blog) -> mapToDto(blog))
+                .collect(Collectors.toList());
     }
 
     //        convert entity to dto

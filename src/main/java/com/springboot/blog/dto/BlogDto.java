@@ -22,4 +22,6 @@ public class BlogDto {
     private String content;
 
     private Set<CommentDto> comments;
+
+    private Long categoryId;
 }

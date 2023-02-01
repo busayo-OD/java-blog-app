@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("api/blogs")
@@ -54,4 +56,11 @@ public class BlogController {
         blogService.deleteBlog(id);
         return new ResponseEntity("Blog deleted successfully", HttpStatus.OK);
     }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<BlogDto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
+        List<BlogDto> blogDtos = blogService.getBlogsByCategory(categoryId);
+        return ResponseEntity.ok(blogDtos);
+    }
+
 }
