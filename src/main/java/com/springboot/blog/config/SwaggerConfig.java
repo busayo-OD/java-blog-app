@@ -32,7 +32,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     private ApiInfo getApiInfo() {
         return new ApiInfoBuilder()
-                .title("API Documentation for CourierX")
+                .title("API Documentation for Blogging App")
                 .version("1.0")
                 .description("Some description here..")
                 .license("Apache License Version 2.0")
