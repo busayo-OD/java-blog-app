@@ -4,7 +4,7 @@ import com.springboot.blog.dto.BlogDto;
 import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

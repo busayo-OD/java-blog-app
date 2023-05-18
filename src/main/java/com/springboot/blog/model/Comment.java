@@ -1,6 +1,6 @@
 package com.springboot.blog.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 @Getter
