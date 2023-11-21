@@ -1,32 +1,37 @@
 package com.springboot.blog.controller;
 
 import com.springboot.blog.dto.BlogDto;
+import com.springboot.blog.dto.BlogInfoDto;
 import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
 import javax.validation.Valid;
+
+import com.springboot.blog.utils.CurrentUserUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
-@RequestMapping("api/blogs")
+@RequestMapping("/blogs")
 public class BlogController {
 
-    private BlogService blogService;
+    private final BlogService blogService;
 
     public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    public ResponseEntity<BlogDto> createBlog(@Valid  @RequestBody BlogDto blogDto){
-        return new ResponseEntity<>(blogService.createBlog(blogDto), HttpStatus.CREATED);
+
+    @PostMapping("/add")
+    public boolean createBlog(@Valid  @RequestBody BlogDto blogDto){
+        Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
+        return blogService.createBlog(userId,blogDto);
     }
 
     @GetMapping()
@@ -40,27 +45,27 @@ public class BlogController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BlogDto> getBlogById(@PathVariable(name = "id") Long id){
+    public ResponseEntity<BlogInfoDto> getBlogById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<BlogDto> updateBlog(@Valid @RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
+    public ResponseEntity<BlogInfoDto> updateBlog(@Valid @RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.updateBlog(blogDto, id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBlogById(@PathVariable(name = "id") Long id){
-        blogService.deleteBlog(id);
-        return new ResponseEntity("Blog deleted successfully", HttpStatus.OK);
+    public boolean deleteBlogById(@PathVariable(name = "id") Long id){
+        return blogService.deleteBlog(id);
+
     }
 
     @GetMapping("/category/{id}")
-    public ResponseEntity<List<BlogDto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
-        List<BlogDto> blogDtos = blogService.getBlogsByCategory(categoryId);
-        return ResponseEntity.ok(blogDtos);
+    public ResponseEntity<List<BlogInfoDto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
+        List<BlogInfoDto> blogs = blogService.getBlogsByCategory(categoryId);
+        return ResponseEntity.ok(blogs);
     }
 
 }
