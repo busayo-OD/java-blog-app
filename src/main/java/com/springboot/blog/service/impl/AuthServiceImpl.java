@@ -60,7 +60,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Email already exist");
         }
         User user = new User();
-        user.setName(registerDto.getName());
+        user.setFirstName(registerDto.getFirstName());
+        user.setLastName(registerDto.getLastName());
         user.setUsername(registerDto.getUsername());
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
