@@ -21,4 +21,26 @@ public class GlobalExceptionHandler2 {
         errors.put("code", ex.getCode().toString());
         return errors;
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(BlogNotFoundException.class)
+    public Object notFound(BlogNotFoundException ex) {
+        final Map<String, Object> errors = new HashMap<String, Object>();
+        errors.put("entityName", BlogNotFoundException.ENTITY_NAME);
+        errors.put("message", ex.getMessage());
+        ex.setCode(HttpStatus.NOT_FOUND.value());
+        errors.put("code", ex.getCode().toString());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public Object notFound(CategoryNotFoundException ex) {
+        final Map<String, Object> errors = new HashMap<String, Object>();
+        errors.put("entityName", CategoryNotFoundException.ENTITY_NAME);
+        errors.put("message", ex.getMessage());
+        ex.setCode(HttpStatus.NOT_FOUND.value());
+        errors.put("code", ex.getCode().toString());
+        return errors;
+    }
 }

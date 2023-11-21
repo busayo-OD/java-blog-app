@@ -4,7 +4,8 @@ import com.springboot.blog.dto.BlogDto;
 import com.springboot.blog.dto.BlogInfoDto;
 import com.springboot.blog.dto.BlogResponse;
 import com.springboot.blog.dto.TagDto;
-import com.springboot.blog.exception.ResourceNotFoundException;
+import com.springboot.blog.exception.BlogNotFoundException;
+import com.springboot.blog.exception.CategoryNotFoundException;
 import com.springboot.blog.exception.UserNotFoundException;
 import com.springboot.blog.model.Blog;
 import com.springboot.blog.model.Category;
@@ -46,9 +47,9 @@ public class BlogServiceImpl implements BlogService {
     public boolean createBlog(Long userId, BlogDto blogDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-
-        Category category = categoryRepository.findById(blogDto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", blogDto.getCategoryId()));
+        Long categoryId = blogDto.getCategoryId();
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 //        convert dto to entity
         Blog blog = mapToEntity(blogDto);
@@ -89,7 +90,8 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogInfoDto getBlogById(Long id) {
-        Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new BlogNotFoundException(id));
         // Increment the reading count
         blog.setReadingCount(blog.getReadingCount() + 1);
         blogRepository.save(blog);
@@ -98,10 +100,11 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogInfoDto updateBlog(BlogDto blogDto, Long id) {
-        Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
-        Category category = categoryRepository.findById(blogDto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", blogDto.getCategoryId()));
-
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new BlogNotFoundException(id));
+        Long categoryId = blogDto.getCategoryId();
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         blog.setTitle(blogDto.getTitle());
         blog.setDescription(blogDto.getDescription());
         blog.setContent(blogDto.getContent());
@@ -113,7 +116,8 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public boolean deleteBlog(Long id) {
-        Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id ));
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new BlogNotFoundException(id));
         blogRepository.delete(blog);
         return true;
     }
