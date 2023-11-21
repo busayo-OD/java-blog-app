@@ -1,6 +1,8 @@
 package com.springboot.blog.model;
 
 import javax.persistence.*;
+
+import com.springboot.blog.model.enums.BlogState;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -42,7 +44,9 @@ public class Blog {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    private String state;
+    @Column(name ="state")
+    @Enumerated(EnumType.STRING)
+    private BlogState state;
 
     @Column(name = "reading_count")
     private int readingCount;

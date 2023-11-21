@@ -24,4 +24,5 @@ public class BlogDto {
     private Set<CommentDto> comments;
 
     private Long categoryId;
+
 }
