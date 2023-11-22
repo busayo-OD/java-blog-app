@@ -87,7 +87,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public BlogResponse getMyBlogs(Long userId, int pageNo, int pageSize, String sortBy, String sortDir) {
+    public BlogResponse getMyBlogs(Long userId, int pageNo, int pageSize, String sortBy, String sortDir, BlogState blogState) {
         // Create a sort object
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -95,8 +95,13 @@ public class BlogServiceImpl implements BlogService {
         // Create pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        // Retrieve only published blogs
-        Page<Blog> blogs = blogRepository.findByUserId(userId, pageable);
+        // Retrieve blogs based on user and optionally filter by blog state
+        Page<Blog> blogs;
+        if (blogState != null) {
+            blogs = blogRepository.findByStateAndUserId(blogState, userId, pageable);
+        } else {
+            blogs = blogRepository.findByStateAndUserIdOrStateIsNull(BlogState.Published, userId, pageable);
+        }
 
         // Get content for page object
         List<Blog> blogList = blogs.getContent();

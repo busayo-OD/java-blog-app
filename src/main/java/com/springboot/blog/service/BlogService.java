@@ -1,6 +1,7 @@
 package com.springboot.blog.service;
 
 import com.springboot.blog.dto.*;
+import com.springboot.blog.model.enums.BlogState;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface BlogService {
 
     BlogResponse getAllBlogs(int pageNo, int pageSize, String sortBy,String sortDir);
 
-    BlogResponse getMyBlogs(Long userId, int pageNo, int pageSize, String sortBy,String sortDir);
+    BlogResponse getMyBlogs(Long userId, int pageNo, int pageSize, String sortBy, String sortDir, BlogState blogState);
 
     BlogInfoDto getBlogById(Long id);
 

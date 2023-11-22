@@ -1,6 +1,7 @@
 package com.springboot.blog.controller;
 
 import com.springboot.blog.dto.*;
+import com.springboot.blog.model.enums.BlogState;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
 import javax.validation.Valid;
@@ -45,11 +46,13 @@ public class BlogController {
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir,
+            @RequestParam(value = "blogState", required = false) BlogState blogState
     ){
         Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
-        return blogService.getMyBlogs(userId, pageNo, pageSize, sortBy, sortDir);
+        return blogService.getMyBlogs(userId, pageNo, pageSize, sortBy, sortDir, blogState);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<BlogInfoDto> getBlogById(@PathVariable(name = "id") Long id){
