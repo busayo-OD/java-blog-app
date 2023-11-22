@@ -3,14 +3,13 @@ package com.springboot.blog.controller;
 import com.springboot.blog.dto.BlogDto;
 import com.springboot.blog.dto.BlogInfoDto;
 import com.springboot.blog.dto.BlogResponse;
+import com.springboot.blog.dto.BlogStateDto;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
 import javax.validation.Valid;
 
 import com.springboot.blog.utils.CurrentUserUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,16 +48,22 @@ public class BlogController {
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<BlogInfoDto> updateBlog(@Valid @RequestBody BlogDto blogDto, @PathVariable(name = "id") Long id){
-        return ResponseEntity.ok(blogService.updateBlog(blogDto, id));
+        Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
+        return ResponseEntity.ok(blogService.updateBlog(userId, blogDto, id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @PutMapping("/edit/state/{id}")
+    public boolean updateBlogState(@Valid @RequestBody BlogStateDto blogStateDto, @PathVariable(name = "id") Long id){
+        Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
+        return blogService.updateBlogState(userId,id, blogStateDto);
+    }
+
+    @DeleteMapping("/delete/{id}")
     public boolean deleteBlogById(@PathVariable(name = "id") Long id){
-        return blogService.deleteBlog(id);
+        Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
+        return blogService.deleteBlog(userId, id);
 
     }
 

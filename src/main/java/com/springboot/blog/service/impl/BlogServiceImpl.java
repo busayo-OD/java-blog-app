@@ -1,9 +1,6 @@
 package com.springboot.blog.service.impl;
 
-import com.springboot.blog.dto.BlogDto;
-import com.springboot.blog.dto.BlogInfoDto;
-import com.springboot.blog.dto.BlogResponse;
-import com.springboot.blog.dto.TagDto;
+import com.springboot.blog.dto.*;
 import com.springboot.blog.exception.BlogNotFoundException;
 import com.springboot.blog.exception.CategoryNotFoundException;
 import com.springboot.blog.exception.UserNotFoundException;
@@ -17,6 +14,7 @@ import com.springboot.blog.repository.CategoryRepository;
 import com.springboot.blog.repository.TagRepository;
 import com.springboot.blog.repository.UserRepository;
 import com.springboot.blog.service.BlogService;
+import com.springboot.blog.utils.BlogUtil;
 import com.springboot.blog.utils.ReadingTimeCalculator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,20 +60,20 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogResponse getAllBlogs(int pageNo, int pageSize, String sortBy, String sortDir) {
-
-//        create a sort object
+        // Create a sort object
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-//      create pageable instance
+        // Create pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<Blog> blogs = blogRepository.findAll(pageable);
+        // Retrieve only published blogs
+        Page<Blog> blogs = blogRepository.findByState(BlogState.Published, pageable);
 
-//        get content for page object
+        // Get content for page object
         List<Blog> blogList = blogs.getContent();
 
-       List<BlogInfoDto> content = blogList.stream().map(this::mapToBlogInfoDto).collect(Collectors.toList());
+        List<BlogInfoDto> content = blogList.stream().map(this::mapToBlogInfoDto).collect(Collectors.toList());
 
         BlogResponse blogResponse = new BlogResponse();
         blogResponse.setContent(content);
@@ -90,7 +88,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogInfoDto getBlogById(Long id) {
-        Blog blog = blogRepository.findById(id)
+        Blog blog = blogRepository.findByIdAndState(id, BlogState.Published)
                 .orElseThrow(() -> new BlogNotFoundException(id));
         // Increment the reading count
         blog.setReadingCount(blog.getReadingCount() + 1);
@@ -99,8 +97,8 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public BlogInfoDto updateBlog(BlogDto blogDto, Long id) {
-        Blog blog = blogRepository.findById(id)
+    public BlogInfoDto updateBlog(Long userId, BlogDto blogDto, Long id) {
+        Blog blog = blogRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BlogNotFoundException(id));
         Long categoryId = blogDto.getCategoryId();
         Category category = categoryRepository.findById(categoryId)
@@ -115,8 +113,8 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public boolean deleteBlog(Long id) {
-        Blog blog = blogRepository.findById(id)
+    public boolean deleteBlog(Long userId, Long id) {
+        Blog blog = blogRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BlogNotFoundException(id));
         blogRepository.delete(blog);
         return true;
@@ -125,9 +123,18 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public List<BlogInfoDto> getBlogsByCategory(Long categoryId) {
 
-        List<Blog> blogs = blogRepository.findByCategoryId(categoryId);
+        List<Blog> blogs = blogRepository.findByCategoryIdAndState(categoryId, BlogState.Published);
         return blogs.stream().map(this::mapToBlogInfoDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean updateBlogState(Long userId, Long id, BlogStateDto blogStateDto) {
+        Blog blog = blogRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new BlogNotFoundException(id));
+        blog.setState(BlogUtil.getBlogState(blogStateDto.getState()));
+        blogRepository.save(blog);
+        return true;
     }
 
     private BlogInfoDto mapToBlogInfoDto(Blog blog){
