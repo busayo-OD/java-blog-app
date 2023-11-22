@@ -178,6 +178,34 @@ public class BlogServiceImpl implements BlogService {
         return true;
     }
 
+    @Override
+    public BlogResponse searchBlogs(String searchTerm, int pageNo, int pageSize, String sortBy, String sortDir) {
+        // Create a sort object
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        // Retrieve only published blogs
+        Page<Blog> blogs = blogRepository.searchPublishedBlogsByUserAndTagsAndTitle(searchTerm, pageable);
+
+        // Get content for page object
+        List<Blog> blogList = blogs.getContent();
+
+        List<BlogInfo2Dto> content = blogList.stream().map(this::mapToBlogInfo2Dto).collect(Collectors.toList());
+
+        BlogResponse blogResponse = new BlogResponse();
+        blogResponse.setContent(content);
+        blogResponse.setPageNo(blogs.getNumber());
+        blogResponse.setPageSize(blogs.getSize());
+        blogResponse.setTotalElements(blogs.getTotalElements());
+        blogResponse.setTotalPages(blogs.getTotalPages());
+        blogResponse.setLast(blogs.isLast());
+
+        return blogResponse;
+    }
+
     private BlogInfoDto mapToBlogInfoDto(Blog blog){
         BlogInfoDto blogInfoDto = new BlogInfoDto();
         blogInfoDto.setId(blog.getId());

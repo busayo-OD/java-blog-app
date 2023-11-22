@@ -75,13 +75,23 @@ public class BlogController {
     public boolean deleteBlogById(@PathVariable(name = "id") Long id){
         Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
         return blogService.deleteBlog(userId, id);
-
     }
 
     @GetMapping("/category/{id}")
     public ResponseEntity<List<BlogInfo2Dto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
         List<BlogInfo2Dto> blogs = blogService.getBlogsByCategory(categoryId);
         return ResponseEntity.ok(blogs);
+    }
+
+    @GetMapping("/search")
+    public BlogResponse searchPublishedBlogs(
+            @RequestParam("searchTerm") String searchTerm,
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+        return blogService.searchBlogs(searchTerm, pageNo, pageSize, sortBy, sortDir);
     }
 
 }

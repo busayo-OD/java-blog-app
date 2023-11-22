@@ -21,4 +21,6 @@ public interface BlogService {
     List<BlogInfo2Dto> getBlogsByCategory(Long categoryId);
 
     boolean updateBlogState (Long userId, Long id, BlogStateDto blogStateDto);
+
+    BlogResponse searchBlogs(String searchTerm, int pageNo, int pageSize, String sortBy, String sortDir);
 }
