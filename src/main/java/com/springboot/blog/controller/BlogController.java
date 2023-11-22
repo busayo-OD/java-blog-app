@@ -1,9 +1,6 @@
 package com.springboot.blog.controller;
 
-import com.springboot.blog.dto.BlogDto;
-import com.springboot.blog.dto.BlogInfoDto;
-import com.springboot.blog.dto.BlogResponse;
-import com.springboot.blog.dto.BlogStateDto;
+import com.springboot.blog.dto.*;
 import com.springboot.blog.service.BlogService;
 import com.springboot.blog.utils.AppConstants;
 import javax.validation.Valid;
@@ -43,6 +40,17 @@ public class BlogController {
         return blogService.getAllBlogs(pageNo, pageSize, sortBy, sortDir);
     }
 
+    @GetMapping("/me")
+    public BlogResponse getMyBlogs(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ){
+        Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
+        return blogService.getMyBlogs(userId, pageNo, pageSize, sortBy, sortDir);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BlogInfoDto> getBlogById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(blogService.getBlogById(id));
@@ -68,8 +76,8 @@ public class BlogController {
     }
 
     @GetMapping("/category/{id}")
-    public ResponseEntity<List<BlogInfoDto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
-        List<BlogInfoDto> blogs = blogService.getBlogsByCategory(categoryId);
+    public ResponseEntity<List<BlogInfo2Dto>> getBlogsByCategory(@PathVariable("id") Long categoryId){
+        List<BlogInfo2Dto> blogs = blogService.getBlogsByCategory(categoryId);
         return ResponseEntity.ok(blogs);
     }
 

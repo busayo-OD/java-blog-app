@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BlogRepository extends JpaRepository<Blog, Long> {
-    List<Blog> findByCategoryIdAndState (Long categoryId, BlogState blogState);
-    Optional<Blog> findByIdAndUserId (Long id, Long userId);
-    Optional<Blog> findByIdAndState (Long id, BlogState blogState);
+    List<Blog> findByCategoryIdAndState(Long categoryId, BlogState blogState);
+    Optional<Blog> findByIdAndUserId(Long id, Long userId);
+    Optional<Blog> findByIdAndState(Long id, BlogState blogState);
     Page<Blog> findByState(BlogState blogState, Pageable pageable);
+    Page<Blog> findByUserId(Long userId, Pageable pageable);
 }

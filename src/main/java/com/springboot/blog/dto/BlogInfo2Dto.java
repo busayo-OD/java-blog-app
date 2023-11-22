@@ -3,14 +3,16 @@ package com.springboot.blog.dto;
 import com.springboot.blog.annotation.BlogStateAnnotation;
 import com.springboot.blog.model.Category;
 import com.springboot.blog.model.enums.BlogState;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@Data
-public class BlogInfoDto {
+@Setter
+@Getter
+public class BlogInfo2Dto {
     private Long id;
 
     private String title;
@@ -31,8 +33,6 @@ public class BlogInfoDto {
     private String readingTime;
 
     private List<TagDto> tags;
-
-    private UserInfoDto owner;
 
     private Date createdOn;
 

@@ -73,7 +73,35 @@ public class BlogServiceImpl implements BlogService {
         // Get content for page object
         List<Blog> blogList = blogs.getContent();
 
-        List<BlogInfoDto> content = blogList.stream().map(this::mapToBlogInfoDto).collect(Collectors.toList());
+        List<BlogInfo2Dto> content = blogList.stream().map(this::mapToBlogInfo2Dto).collect(Collectors.toList());
+
+        BlogResponse blogResponse = new BlogResponse();
+        blogResponse.setContent(content);
+        blogResponse.setPageNo(blogs.getNumber());
+        blogResponse.setPageSize(blogs.getSize());
+        blogResponse.setTotalElements(blogs.getTotalElements());
+        blogResponse.setTotalPages(blogs.getTotalPages());
+        blogResponse.setLast(blogs.isLast());
+
+        return blogResponse;
+    }
+
+    @Override
+    public BlogResponse getMyBlogs(Long userId, int pageNo, int pageSize, String sortBy, String sortDir) {
+        // Create a sort object
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        // Retrieve only published blogs
+        Page<Blog> blogs = blogRepository.findByUserId(userId, pageable);
+
+        // Get content for page object
+        List<Blog> blogList = blogs.getContent();
+
+        List<BlogInfo2Dto> content = blogList.stream().map(this::mapToBlogInfo2Dto).collect(Collectors.toList());
 
         BlogResponse blogResponse = new BlogResponse();
         blogResponse.setContent(content);
@@ -101,12 +129,20 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = blogRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BlogNotFoundException(id));
         Long categoryId = blogDto.getCategoryId();
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-        blog.setTitle(blogDto.getTitle());
-        blog.setDescription(blogDto.getDescription());
-        blog.setContent(blogDto.getContent());
-        blog.setCategory(category);
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+            blog.setCategory(category);
+        }
+        if (!blogDto.getTitle().isEmpty()){
+            blog.setTitle(blogDto.getTitle());
+        }
+        if (!blogDto.getDescription().isEmpty()){
+            blog.setDescription(blogDto.getDescription());
+        }
+        if (!blogDto.getContent().isEmpty()){
+            blog.setContent(blogDto.getContent());
+        }
 
         Blog updatedBlog = blogRepository.save(blog);
         return mapToBlogInfoDto(updatedBlog);
@@ -121,10 +157,10 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public List<BlogInfoDto> getBlogsByCategory(Long categoryId) {
+    public List<BlogInfo2Dto> getBlogsByCategory(Long categoryId) {
 
         List<Blog> blogs = blogRepository.findByCategoryIdAndState(categoryId, BlogState.Published);
-        return blogs.stream().map(this::mapToBlogInfoDto)
+        return blogs.stream().map(this::mapToBlogInfo2Dto)
                 .collect(Collectors.toList());
     }
 
@@ -149,16 +185,44 @@ public class BlogServiceImpl implements BlogService {
         blogInfoDto.setReadingTime(blog.getReadingTime());
         blogInfoDto.setCreatedOn(blog.getCreatedOn());
         blogInfoDto.setUpdatedOn(blog.getUpdatedOn());
+        blogInfoDto.setOwner(mapToUserInfoDto(blog.getUser()));
         blogInfoDto.setTags(blog.getTags().stream().map(this::mapToTagDto)
                 .collect(Collectors.toList()));
         return blogInfoDto;
     }
+
+    private BlogInfo2Dto mapToBlogInfo2Dto(Blog blog){
+        BlogInfo2Dto blogInfo2Dto = new BlogInfo2Dto();
+        blogInfo2Dto.setId(blog.getId());
+        blogInfo2Dto.setTitle(blog.getTitle());
+        blogInfo2Dto.setDescription(blog.getDescription());
+        blogInfo2Dto.setContent(blog.getContent());
+        blogInfo2Dto.setCategory(blog.getCategory());
+        blogInfo2Dto.setState(String.valueOf(blog.getState()));
+        blogInfo2Dto.setReadingCount(blog.getReadingCount());
+        blogInfo2Dto.setReadingTime(blog.getReadingTime());
+        blogInfo2Dto.setCreatedOn(blog.getCreatedOn());
+        blogInfo2Dto.setUpdatedOn(blog.getUpdatedOn());
+        blogInfo2Dto.setTags(blog.getTags().stream().map(this::mapToTagDto)
+                .collect(Collectors.toList()));
+        return blogInfo2Dto;
+    }
+
 
     private TagDto mapToTagDto (Tag tag){
         TagDto tagDto = new TagDto();
         tagDto.setId(tag.getId());
         tagDto.setName(tag.getName());
         return tagDto;
+    }
+
+    private UserInfoDto mapToUserInfoDto (User user){
+        UserInfoDto userInfoDto = new UserInfoDto();
+        userInfoDto.setFirstName(user.getFirstName());
+        userInfoDto.setLastName(user.getLastName());
+        userInfoDto.setUsername(user.getUsername());
+        userInfoDto.setEmail(user.getEmail());
+        return userInfoDto;
     }
 
     //        convert dto to entity
