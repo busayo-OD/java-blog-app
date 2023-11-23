@@ -15,3 +15,6 @@ This is a blogging backend application. It allows users create blogs, manage the
 ## How to start the app
 
 You should be able to start the example application by executing com.springboot.blog, which starts a webserver on port 8080 (http://localhost:8080)
+
+## API Documentation
+- Swagger : https://blog-vista.onrender.com/swagger-ui/#
