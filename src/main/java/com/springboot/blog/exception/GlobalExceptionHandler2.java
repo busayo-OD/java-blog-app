@@ -43,4 +43,15 @@ public class GlobalExceptionHandler2 {
         errors.put("code", ex.getCode().toString());
         return errors;
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordMismatchException.class)
+    public Object mismatch(PasswordMismatchException ex) {
+        final Map<String, Object> errors = new HashMap<String, Object>();
+        errors.put("entityName", "User");
+        errors.put("message", ex.getMessage());
+        ex.setCode(HttpStatus.BAD_REQUEST.value());
+        errors.put("code", ex.getCode().toString());
+        return errors;
+    }
 }

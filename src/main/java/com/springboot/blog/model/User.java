@@ -32,6 +32,19 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    private String city;
+
+    private String state;
+
+    private String country;
+
+    private String avatar;
+
+    private String status;
+
     @Column(nullable = false)
     private String password;
 

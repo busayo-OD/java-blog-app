@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class
+CustomUserDetailsService implements UserDetailsService {
 
     private UserRepository userRepository;
 
@@ -24,6 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email: " + usernameOrEmail));
+        if (user == null) {
+            throw new UsernameNotFoundException("User cannot be found");
+        } else if (user.getStatus().equals("Deactivated")){
+            throw new UsernameNotFoundException("User deactivated");
+        }
 
         return UserDetailsImpl.build(user);
     }
