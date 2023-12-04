@@ -10,7 +10,7 @@ FROM adoptopenjdk/openjdk11
 
 WORKDIR /usr/src/app
 
-EXPOSE 8180
+EXPOSE 8080
 
 COPY --from=build /usr/src/app/target/blog-rest-api-0.0.1-SNAPSHOT.jar ./app.jar
 
