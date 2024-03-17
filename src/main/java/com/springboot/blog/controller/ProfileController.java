@@ -38,9 +38,9 @@ public class ProfileController {
     }
 
     @PostMapping("/deactivate-account")
-    public void deactivateAccount(){
+    public boolean deactivateAccount(){
         Long userId = Objects.requireNonNull(CurrentUserUtil.getCurrentUser()).getId();
-        profileService.deactivateAccount(userId);
+        return profileService.deactivateAccount(userId);
     }
 
     @PostMapping("/reset-password")

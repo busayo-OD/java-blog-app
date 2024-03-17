@@ -9,6 +9,6 @@ public interface ProfileService {
     ProfileDto getProfile(Long id);
     boolean editProfile(UpdateProfileDto updateProfileDto, Long id);
     boolean editAvatar(UpdateAvatarDto updateAvatarDto, Long id);
-    void deactivateAccount(Long id);
+    boolean deactivateAccount(Long id);
     boolean changePassword(ChangePasswordDto changePasswordDto);
 }

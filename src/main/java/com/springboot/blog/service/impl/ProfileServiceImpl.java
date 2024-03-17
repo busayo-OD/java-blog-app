@@ -86,11 +86,12 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deactivateAccount(Long id){
+    public boolean deactivateAccount(Long id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         user.setStatus("Deactivated");
         userRepository.save(user);
+        return true;
     }
 
     @Override
